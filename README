@@ -1,7 +1,16 @@
 png2audioSpectrum creates audio spectra that are looking like an image that you can provide.
 A spectrum is the frequency representation of a signal, in this case the sound.
 
+Note: at the moment you can only use some pngs that are saves as monochrome images
+maybe future updates will extend that. If you are unclear about what I mean look 
+at the example image as this should work perfectly.
+
 Usage: 
-1. have a file img.png in the same folder as the script
-2. run 'python pn2audioSpectrum.py'
-3. after finishing successfully you have a file calles png2audioSpectrum.wav in the same folder as the script
+    1. have a file img.png in the same folder as the script
+    2. run 'python pn2audioSpectrum.py'
+    3. after finishing successfully you have a file calles png2audioSpectrum.wav in the same folder as the script
+
+Dependencies:
+
+    Python Imaging Library (http://www.pythonware.com/products/pil/)
+    NumPy
