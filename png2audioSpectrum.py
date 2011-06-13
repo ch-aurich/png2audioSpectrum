@@ -35,17 +35,20 @@ class SoundFile:
         self.file.writeframes(self.signal)
         self.file.close()
 
-#load B/W PNG image as array
 def getPngBwPicture(filename,ySize):
+    """reads png from filename, resizes to have width of ySize and returns resized image - does not change the file!"""
     im = Image.open(filename)
     size = im.size
+    #convert to b/w picture - ie only contain 0 and 1 in array
     #im = im.convert('P')
-    #print im.mode
+    #resizes the image to have a width of ySize
     im = im.resize((size[0]*ySize/size[1],ySize))
+    #get array of picture that will be returned
     pix = im.load()
     return pix
 
 def getSignalMix(duration,freqlow,freqstep,pix,iteration,ydim):
+    """produces an signal of $duration seconds lenght that consists of multiple sines that are specified by the given image array."""
     sumsignal = get_signal_data(1, duration, 0);
     for f in range(0,ydim):
 	if (pix[f,iteration]==1):
@@ -53,24 +56,40 @@ def getSignalMix(duration,freqlow,freqstep,pix,iteration,ydim):
     return sumsignal
 
 
-
 if __name__ == '__main__':
-    stepDuration = 0.5
+    #time one spectrum will be held
+    stepDuration = 0.5			
+
+    #output filename - TODO: read from script arguments
     myfilename = 'png2audioSpectrum.wav'
+
+    #number of distinct frequencies used to make up the image - TODO: calculate that by the parameters given
+    #eg calculate by frequency bounds and minimum resolution (50Hz is good)
     numSteps = 400
+
+    #lowest used frequency - TODO:make this accessible by an external parameter
     minfrequency = 100
+
+    #reads image from fixed filename - TODO: make filename accessible by external parameter
     pix = getPngBwPicture('img.png',numSteps)
 
+    #initialize array sumsignal by calling getSignalMix for the first bunch of pixels
     sumsignal = getSignalMix(stepDuration,minfrequency,50,pix,0,numSteps)
+    #start looping through image at the second bunch of pixels
     for n in range(1,numSteps - 1):
         sumsignal1 = getSignalMix(stepDuration,minfrequency,50,pix,n,numSteps)
 	sumsignal = N.concatenate((sumsignal, sumsignal1))
+	#if an real number for progress in % is reached update display
 	if ((1000*n/numSteps)%10==0):
+            #update display - delete previous output and print new progress
 	    print '\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r',"reading: %2d percent done" % (100*n/numSteps),
             sys.stdout.flush()
 
-    print "\nconverting and saving to wave"
+    print '\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r', "finished reading image"
+
+    print "converting to wave"
     signal = numpy2string(sumsignal)
     f = SoundFile(signal, myfilename, stepDuration*numSteps)
+    print "saving wave"
     f.write()
-    print 'file written'
+    print 'file written successfully'
